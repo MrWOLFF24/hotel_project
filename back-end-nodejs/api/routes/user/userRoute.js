@@ -51,32 +51,46 @@ router.patch('/avatar', checkAuth, upload.single('avatar'), (req, res, next) => 
 });
 
 router.patch('/password', checkAuth, (req, res, next) => {
-  userModel.patch.password(response => {
-    res.status(201).send(response);
-  }, req.body);
+  if (req.userData.user.is_admin) {
+    userModel.patch.password(response => {
+      res.status(201).send(response);
+    }, req.body);
+  } else {
+    res.status(403).send({message: 'Vous n\'êtes pas autorisé à effectuer cette action.'});
+  }
 });
 
 router.delete('/:id', checkAuth, (req, res) => {
-  userModel.remove((response) => {
-      res.status(201).send(response);
-  }, req.params.id);
+  if (req.userData.user.is_admin) {
+    userModel.remove((response) => {
+        res.status(201).send(response);
+    }, req.params.id);
+  } else {
+    res.status(403).send({message: 'Vous n\'êtes pas autorisé à effectuer cette action.'});
+  }
 });
 
 router.put('/', checkAuth, (req, res) => {
-  userModel.putUser((response) => {
-    res.status(201).send(response);
-  }, req.body);
+  if (req.userData.user.is_admin) {
+    userModel.putUser((response) => {
+      res.status(201).send(response);
+    }, req.body);
+  } else {
+    res.status(403).send({message: 'Vous n\'êtes pas autorisé à effectuer cette action.'});
+  }
 });
 
 router.get('/', checkAuth, (req, res) => {
+  if (req.userData.user.is_admin) {
     userModel.getUser((response) => {
       res.status(201).send(response);
     });
+  } else {
+    res.status(403).send({message: 'Vous n\'êtes pas autorisé à effectuer cette action.'});
+  }
 });
 
 router.post('/getAvatar', checkAuth, (req, res) => {
-  console.log(req.body);
-
   if (req.body.avatar) {
     setTimeout(() => {
       const ext = req.body.avatar.split('.');
